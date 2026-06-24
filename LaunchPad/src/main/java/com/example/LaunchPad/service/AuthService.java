@@ -37,4 +37,20 @@ public class AuthService {
         return new AuthResponse(token);
     }
 
+    public AuthResponse register(@Valid RegisterRequest request) {
+        if(userRepository.existsByEmail(request.getEmail())) {
+            throw new AppException("Email already in use");
+        }
+
+        Users user = Users.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .username(request.getUsername())
+                .role(request.getRole())
+                .build();
+
+        userRepository.save(user);
+        String token = jwtUtil.generateToken(user.getEmail(),user.getRole().name());
+        return new AuthResponse(token);
+    }
 }
