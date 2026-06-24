@@ -29,11 +29,8 @@ public class Task {
     @JoinColumn(name = "journey_id")
     private Journey journey;
 
-    private LocalDate due_date;
+    private Integer dueDaysOffset;
 
     private boolean requiresApproval;
-
-    @Enumerated(EnumType.STRING)
-    private Role assigned_role;
 
 }

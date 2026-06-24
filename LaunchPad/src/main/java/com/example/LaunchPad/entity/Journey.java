@@ -22,4 +22,8 @@ public class Journey {
     private String description;
 
     private String title;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_hr_id")
+    private Users createdByHr;
 }

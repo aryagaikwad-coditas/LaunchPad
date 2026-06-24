@@ -1,5 +1,6 @@
 package com.example.LaunchPad.dto.request;
 
+import com.example.LaunchPad.constants.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -22,5 +23,6 @@ public class RegisterRequest {
     private String password;
     @NotBlank(message = "Username is a required field ")
     private String username;
-    //private Role role;
+
+    private Role role;
 }
