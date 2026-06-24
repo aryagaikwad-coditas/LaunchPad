@@ -23,6 +23,5 @@ public class RegisterRequest {
     private String password;
     @NotBlank(message = "Username is a required field ")
     private String username;
-
     private Role role;
 }
