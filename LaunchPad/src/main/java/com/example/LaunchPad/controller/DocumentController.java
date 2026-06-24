@@ -18,5 +18,4 @@ public class DocumentController {
 
     private final DocumentService documentService;
 
-
 }
