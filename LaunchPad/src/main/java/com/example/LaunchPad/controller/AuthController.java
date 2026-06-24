@@ -1,6 +1,7 @@
 package com.example.LaunchPad.controller;
 
 import com.example.LaunchPad.dto.request.LoginRequest;
+import com.example.LaunchPad.dto.request.RegisterRequest;
 import com.example.LaunchPad.dto.response.ApiResponse;
 import com.example.LaunchPad.dto.response.AuthResponse;
 import com.example.LaunchPad.service.AuthService;
@@ -22,5 +23,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(ApiResponse.success("User logged in successfully",authService.login(request)));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(ApiResponse.success("Registered successfully ",authService.register(request)));
     }
 }

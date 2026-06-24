@@ -1,8 +1,10 @@
 package com.example.LaunchPad.service;
 
 import com.example.LaunchPad.dto.request.LoginRequest;
+import com.example.LaunchPad.dto.request.RegisterRequest;
 import com.example.LaunchPad.dto.response.AuthResponse;
 import com.example.LaunchPad.entity.Users;
+import com.example.LaunchPad.exceptions.AppException;
 import com.example.LaunchPad.exceptions.UserNotFoundException;
 import com.example.LaunchPad.repository.UserRepository;
 import com.example.LaunchPad.security.JwtUtil;
@@ -32,6 +34,22 @@ public class AuthService {
                 .orElseThrow(()-> new UserNotFoundException("User not found "));
 
         String token = jwtUtil.generateToken(user.getEmail(),user.getRole().name());
+        return new AuthResponse(token);
+    }
+
+    public AuthResponse register(@Valid RegisterRequest request) {
+        if(userRepository.existsByEmail(request.getEmail())){
+            throw new AppException("Email already exists");
+        }
+
+        Users user = Users.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .username(request.getUsername())
+                .role(request.getRole())
+                .build();
+        userRepository.save(user);
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
         return new AuthResponse(token);
     }
 }
