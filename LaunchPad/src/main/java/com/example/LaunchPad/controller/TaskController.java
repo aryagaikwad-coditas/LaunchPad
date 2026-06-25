@@ -41,6 +41,7 @@ public class TaskController {
     }
 
     @GetMapping("/journey/{journeyId}")
+    @PreAuthorize("hasRole('HR')")
     public ResponseEntity<List<TaskResponse>> getTaskByJourneyId(@PathVariable Long id){
         return ResponseEntity.ok(Collections.singletonList(taskService.getTaskById(id)));
     }

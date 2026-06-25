@@ -25,10 +25,9 @@ public class JourneyController {
     private final JourneyService journeyService;
 
     @PostMapping
-    @PreAuthorize("hasRole('HR')")
-    public ResponseEntity<ApiResponse<JourneyResponse >> createJourney(@Valid @RequestBody JourneyRequest request,
+    public ResponseEntity<ApiResponse<JourneyResponse>> createJourney(@Valid @RequestBody JourneyRequest request,
                                                                        @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(ApiResponse.success("Created The journey",journeyService.createJourney(request,userDetails.getUsername())));
+        return ResponseEntity.ok(ApiResponse.success("Created The journey",journeyService.createJourney(request, userDetails.getUsername())));
     }
 
     @GetMapping
@@ -39,20 +38,20 @@ public class JourneyController {
 
     @GetMapping("/{journeyId}")
     @PreAuthorize("hasRole('HR')")
-    public ResponseEntity<ApiResponse<JourneyResponse>> getByJourneyId(@PathVariable Long id){
-        return ResponseEntity.ok(ApiResponse.success("Fetching journey By their Id",journeyService.getByJourneyId(id)));
+    public ResponseEntity<ApiResponse<JourneyResponse>> getByJourneyId(@PathVariable Long journeyId){
+        return ResponseEntity.ok(ApiResponse.success("Fetching journey By their Id",journeyService.getByJourneyId(journeyId)));
     }
 
     @PutMapping("/{journeyId}")
     @PreAuthorize("hasRole('HR')")
-    public ResponseEntity<ApiResponse<JourneyResponse>> updateJourney(@PathVariable Long id, @Valid @RequestBody UpdateJourneyRequest request){
-        return ResponseEntity.ok(ApiResponse.success("Successfully updated a journey",journeyService.updateJourney(id,request)));
+    public ResponseEntity<ApiResponse<JourneyResponse>> updateJourney(@PathVariable Long journeyId, @Valid @RequestBody UpdateJourneyRequest request){
+        return ResponseEntity.ok(ApiResponse.success("Successfully updated a journey",journeyService.updateJourney(journeyId,request)));
     }
 
     @DeleteMapping("/{journeyId}")
     @PreAuthorize("hasRole('HR')")
-    public ResponseEntity<String> deleteJourney(@PathVariable Long id){
-        journeyService.deleteJourney(id);
+    public ResponseEntity<String> deleteJourney(@PathVariable Long journeyId){
+        journeyService.deleteJourney(journeyId);
         return ResponseEntity.ok("Successfully deleted the journey");
     }
 }

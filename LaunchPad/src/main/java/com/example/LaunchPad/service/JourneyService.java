@@ -48,6 +48,7 @@ public class JourneyService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public List<JourneyResponse> getAllJourneys() {
 
         return journeyRepository.findAll()
@@ -56,6 +57,7 @@ public class JourneyService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public JourneyResponse getByJourneyId(Long id) {
         Journey journey = journeyRepository.findById(id)
                 .orElseThrow(()-> new AppException("Journey not found"));
@@ -63,7 +65,7 @@ public class JourneyService {
         return mapToResponse(journey);
     }
 
-
+    @Transactional
     public JourneyResponse updateJourney(Long id, @Valid UpdateJourneyRequest request) {
         Journey journey = journeyRepository.findById(id)
                 .orElseThrow(()-> new AppException("Journey not found"));
@@ -75,6 +77,7 @@ public class JourneyService {
         return mapToResponse(journey);
     }
 
+    @Transactional
     public void deleteJourney(Long id) {
         Journey journey = journeyRepository.findById(id)
                 .orElseThrow(()-> new AppException("Journey not found"));
