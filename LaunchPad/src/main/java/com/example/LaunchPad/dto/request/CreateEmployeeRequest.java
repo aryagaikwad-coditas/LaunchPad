@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 public class CreateEmployeeRequest {
     private String username;
     private String email;
-    private String managerId;
+    private Long managerId;
     private Long journeyId;
+    private Long hrId;
 }

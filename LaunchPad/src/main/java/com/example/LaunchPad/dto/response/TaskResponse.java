@@ -12,5 +12,6 @@ public class TaskResponse {
     private String title;
     private String description;
     private boolean requiresApproval;
+    private Long journeyId;
     private Integer dueDaysOffset;
 }

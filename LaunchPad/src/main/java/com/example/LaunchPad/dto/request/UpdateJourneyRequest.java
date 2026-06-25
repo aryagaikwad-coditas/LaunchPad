@@ -2,17 +2,15 @@ package com.example.LaunchPad.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class JourneyRequest {
+public class UpdateJourneyRequest {
     @NotBlank
     private String title;
     @NotBlank
     private String description;
 }
-

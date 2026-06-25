@@ -14,4 +14,5 @@ public class TaskRequest {
     private String description;
     private boolean requiresApproval;
     private Integer dueDaysOffset;
+    private Long journeyId;
 }
