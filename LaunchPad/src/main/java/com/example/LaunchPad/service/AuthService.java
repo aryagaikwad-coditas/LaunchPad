@@ -1,6 +1,7 @@
 package com.example.LaunchPad.service;
 
 import com.example.LaunchPad.dto.request.LoginRequest;
+import com.example.LaunchPad.dto.request.PasswordResetRequest;
 import com.example.LaunchPad.dto.request.RegisterRequest;
 import com.example.LaunchPad.dto.response.AuthResponse;
 import com.example.LaunchPad.entity.Users;
@@ -52,5 +53,8 @@ public class AuthService {
         userRepository.save(user);
         String token = jwtUtil.generateToken(user.getEmail(),user.getRole().name());
         return new AuthResponse(token);
+    }
+
+    public void resetPassword(PasswordResetRequest request) {
     }
 }

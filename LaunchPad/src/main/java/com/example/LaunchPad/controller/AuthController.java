@@ -1,6 +1,7 @@
 package com.example.LaunchPad.controller;
 
 import com.example.LaunchPad.dto.request.LoginRequest;
+import com.example.LaunchPad.dto.request.PasswordResetRequest;
 import com.example.LaunchPad.dto.request.RegisterRequest;
 import com.example.LaunchPad.dto.response.ApiResponse;
 import com.example.LaunchPad.dto.response.AuthResponse;
@@ -28,5 +29,12 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(ApiResponse.success("User registered successfully on the platform ",authService.register(request)));
+    }
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<String>> resetPassword(
+            @RequestBody PasswordResetRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok(ApiResponse.success(
+                "Password reset successful. Please login with your new password.", null));
     }
 }
