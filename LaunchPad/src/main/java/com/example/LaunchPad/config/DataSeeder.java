@@ -20,7 +20,7 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        seedUser("HR ADMIN","hrlaunchpad@gmail.com","hr123", Role.HR);
+        seedUser("HR","hrlaunchpad@gmail.com","hr123", Role.HR);
     }
 
     private void seedUser(String username, String email, String password, Role role) {

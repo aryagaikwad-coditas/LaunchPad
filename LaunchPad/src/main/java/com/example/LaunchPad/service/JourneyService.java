@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class JourneyService {
 
     private final UserRepository userRepository;
 
+    @Transactional
     public JourneyResponse createJourney(@Valid JourneyRequest request, String username) {
         Users hr = userRepository.findByEmail(username)
                 .orElseThrow(()-> new AppException("Hr does not exists with this Id"));
