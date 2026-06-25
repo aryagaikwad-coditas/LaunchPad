@@ -1,6 +1,7 @@
 package com.example.LaunchPad.controller;
 
 import com.example.LaunchPad.dto.request.JourneyRequest;
+import com.example.LaunchPad.dto.request.UpdateJourneyRequest;
 import com.example.LaunchPad.dto.response.ApiResponse;
 import com.example.LaunchPad.dto.response.JourneyResponse;
 import com.example.LaunchPad.dto.response.TaskResponse;
@@ -26,8 +27,32 @@ public class JourneyController {
     @PostMapping
     @PreAuthorize("hasRole('HR')")
     public ResponseEntity<ApiResponse<JourneyResponse >> createJourney(@Valid @RequestBody JourneyRequest request,
-                                                                       @AuthenticationPrincipal UserDetails  userDetails) {
-        return ResponseEntity.ok(ApiResponse.success("Created The journey",journeyService.createJourney(request,userDetails)));
+                                                                       @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(ApiResponse.success("Created The journey",journeyService.createJourney(request,userDetails.getUsername())));
     }
 
+    @GetMapping
+    @PreAuthorize("hasRole('HR')")
+    public ResponseEntity<List<JourneyResponse>> getAllJourneys(){
+        return ResponseEntity.ok(journeyService.getAllJourneys());
+    }
+
+    @GetMapping("/{journeyId}")
+    @PreAuthorize("hasRole('HR')")
+    public ResponseEntity<ApiResponse<JourneyResponse>> getByJourneyId(@PathVariable Long id){
+        return ResponseEntity.ok(ApiResponse.success("Fetching journey By their Id",journeyService.getByJourneyId(id)));
+    }
+
+    @PutMapping("/{journeyId}")
+    @PreAuthorize("hasRole('HR')")
+    public ResponseEntity<ApiResponse<JourneyResponse>> updateJourney(@PathVariable Long id, @Valid @RequestBody UpdateJourneyRequest request){
+        return ResponseEntity.ok(ApiResponse.success("Successfully updated a journey",journeyService.updateJourney(id,request)));
+    }
+
+    @DeleteMapping("/{journeyId}")
+    @PreAuthorize("hasRole('HR')")
+    public ResponseEntity<String> deleteJourney(@PathVariable Long id){
+        journeyService.deleteJourney(id);
+        return ResponseEntity.ok("Successfully deleted the journey");
+    }
 }
