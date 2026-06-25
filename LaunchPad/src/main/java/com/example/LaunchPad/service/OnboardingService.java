@@ -28,18 +28,35 @@ public class OnboardingService {
     private final UserRepository userRepository;
     private final OnboardingRecordRepository onboardingRecordRepository;
 
-    public OnboardingResponse getMyOnboarding(String username) {
-
-    }
 
     @Transactional(readOnly = true)
     public List<OnboardingResponse> getAllOnboardings() {
+        return onboardingRecordRepository.findAll()
+                .stream()
+                .map(this :: map)
+                .toList();
     }
 
-
-    public List<OnboardingResponse> getManagerOnboardings(String username) {
+    private OnboardingResponse map(OnboardingRecord onboardingRecord) {
+        return OnboardingResponse.builder()
+                .id(onboardingRecord.getId())
+                .newHireId(onboardingRecord.getNewHire().getId())
+                .newHireName(onboardingRecord.getNewHire().getUsername())
+                .managerId(onboardingRecord.getManager().getId())
+                .managerName(onboardingRecord.getManager().getUsername())
+                .journeyId(onboardingRecord.getJourney().getId())
+                .journeyTitle(onboardingRecord.getJourney().getTitle())
+                .startDate(onboardingRecord.getStartDate())
+                .status(onboardingRecord.getStatus())
+                .build();
     }
 
     public OnboardingResponse getOnboardingById(Long id) {
+        OnboardingRecord onboardingRecord = onboardingRecordRepository.findById(id)
+                .orElseThrow(()-> new AppException("OnboardingRecord not found"));
+
+        onboardingRecord = onboardingRecordRepository.save(onboardingRecord);
+        return map(onboardingRecord);
     }
+
 }
