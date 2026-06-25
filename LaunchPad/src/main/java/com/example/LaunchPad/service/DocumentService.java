@@ -1,5 +1,7 @@
 package com.example.LaunchPad.service;
 
+import com.example.LaunchPad.exceptions.AppException;
+import com.example.LaunchPad.repository.DocumentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,4 +17,11 @@ import java.util.UUID;
 @Slf4j
 public class DocumentService {
 
+    private final DocumentRepository documentRepository;
+
+    public void uploadDocument(MultipartFile file) {
+        if(file.isEmpty()) {
+            throw new AppException("file is empty ");
+        }
+    }
 }

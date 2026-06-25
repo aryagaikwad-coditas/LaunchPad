@@ -2,6 +2,7 @@ package com.example.LaunchPad.controller;
 
 import com.example.LaunchPad.service.DocumentService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,4 +19,9 @@ public class DocumentController {
 
     private final DocumentService documentService;
 
+    @PostMapping("/upload")
+    public ResponseEntity<String> upload(@RequestParam MultipartFile file) throws IOException {
+        documentService.uploadDocument(file);
+        return ResponseEntity.ok("Uploaded successfully");
+    }
 }
