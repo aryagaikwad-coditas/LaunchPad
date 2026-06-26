@@ -13,5 +13,5 @@ public class CreateEmployeeRequest {
     private String email;
     private Long managerId;
     private Long journeyId;
-    private Long hrId;
+
 }

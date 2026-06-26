@@ -44,5 +44,8 @@ public class Users {
     @Builder.Default
     private boolean is_active = true;
 
+    @Column(nullable = false)
+    private boolean passwordChanged = false; // feild to basically validated where the new_hire has changed the temp password
+
 
 }

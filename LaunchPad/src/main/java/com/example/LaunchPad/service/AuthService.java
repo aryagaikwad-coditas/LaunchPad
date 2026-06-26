@@ -47,6 +47,7 @@ public class AuthService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .username(request.getUsername())
+                .passwordChanged(true)
                 .role(request.getRole())
                 .build();
 
@@ -56,5 +57,24 @@ public class AuthService {
     }
 
     public void resetPassword(PasswordResetRequest request) {
+        Users user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(()-> new AppException("User not found"));
+
+        if(!passwordEncoder.matches(request.getTempPassword(), user.getPassword())){
+            throw new AppException("Invalid Temp Password ");
+        }
+
+        if(user.isPasswordChanged()){
+            throw new AppException("Password already changed please use login option ");
+        }
+
+        if(request.getNewPassword() == null || request.getNewPassword().length() < 6){
+            throw new AppException("Password is very small ");
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setPasswordChanged(true);
+        userRepository.save(user);
     }
+
+
 }
