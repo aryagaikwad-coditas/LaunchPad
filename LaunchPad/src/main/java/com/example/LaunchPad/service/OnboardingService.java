@@ -5,6 +5,7 @@ import com.example.LaunchPad.constants.Role;
 import com.example.LaunchPad.constants.TaskStatus;
 import com.example.LaunchPad.dto.request.CreateOnboardingRequest;
 import com.example.LaunchPad.dto.response.OnboardingResponse;
+import com.example.LaunchPad.dto.response.TaskInstanceResponse;
 import com.example.LaunchPad.entity.*;
 import com.example.LaunchPad.exceptions.AppException;
 import com.example.LaunchPad.repository.*;
@@ -31,37 +32,6 @@ public class OnboardingService {
     private final EmailService emailService;
     private final OnboardingRecordRepository onboardingRecordRepository;
 
-
-    @Transactional(readOnly = true)
-    public List<OnboardingResponse> getAllOnboardings() {
-        return onboardingRecordRepository.findAll()
-                .stream()
-                .map(this :: map)
-                .toList();
-    }
-
-    private OnboardingResponse map(OnboardingRecord onboardingRecord) {
-        return OnboardingResponse.builder()
-                .id(onboardingRecord.getId())
-                .newHireId(onboardingRecord.getNewHire().getId())
-                .newHireName(onboardingRecord.getNewHire().getUsername())
-                .managerId(onboardingRecord.getManager().getId())
-                .managerName(onboardingRecord.getManager().getUsername())
-                .journeyId(onboardingRecord.getJourney().getId())
-                .journeyTitle(onboardingRecord.getJourney().getTitle())
-                .startDate(onboardingRecord.getStartDate())
-                .status(onboardingRecord.getStatus())
-                .build();
-    }
-
-    public OnboardingResponse getOnboardingById(Long id) {
-        OnboardingRecord onboardingRecord = onboardingRecordRepository.findById(id)
-                .orElseThrow(()-> new AppException("OnboardingRecord not found"));
-
-        onboardingRecord = onboardingRecordRepository.save(onboardingRecord);
-        return map(onboardingRecord);
-    }
-
     public OnboardingResponse createOnboarding(@Valid CreateOnboardingRequest request, String hrMail) {
         Users newHire = userRepository.findById(request.getNewHireId())
                 .orElseThrow(()-> new AppException("User not found"));
@@ -86,6 +56,7 @@ public class OnboardingService {
         if (templateTasks.isEmpty()) {
             throw new AppException("Journey has no tasks");
         }
+
         OnboardingRecord record =  OnboardingRecord.builder()
                 .newHire(newHire)
                 .manager(manager)
@@ -111,15 +82,96 @@ public class OnboardingService {
         return toResponse(record);
     }
 
+    public OnboardingResponse markCompleted(Long id) {
+        OnboardingRecord record = onboardingRecordRepository.findById(id)
+                .orElseThrow(()-> new AppException("Record not found"));
+
+        if(record.getStatus() == OnboardingStatus.COMPLETED){
+            throw new AppException("Onboarding has been completed");
+        }
+        record.setStatus(OnboardingStatus.COMPLETED);
+        onboardingRecordRepository.save(record);
+
+        emailService.sendOnboardingCompleteEmail(record.getNewHire().getEmail(),record.getNewHire().getUsername());
+
+        return toResponse(record);
+    }
+
+    @Transactional(readOnly = true)
+    public List<OnboardingResponse> getMyTeam(String managerEmail) {
+            Users manager = userRepository.findByEmail(managerEmail)
+                    .orElseThrow(()-> new AppException("Manager not found"));
+
+            return onboardingRecordRepository.findByManagerId(manager.getId())
+                    .stream()
+                    .map(this::toResponse)
+                    .toList();
+
+    }
+
+    public OnboardingResponse getMyOnboarding(String email) {
+        Users newHire = userRepository.findByEmail(email)
+                .orElseThrow(()-> new AppException("Employee not found"));
+
+        OnboardingRecord record = onboardingRecordRepository.findByNewHireId(newHire.getId())
+                .orElseThrow(()-> new AppException("Record not found"));
+
+        return  toResponse(record);
+
+    }
+
+    @Transactional(readOnly = true)
+    public List<OnboardingResponse> getAllOnboardings() {
+        return onboardingRecordRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public OnboardingResponse getOnboardingById(Long id, String email) {
+
+        Users user = userRepository.findByEmail(email)
+                .orElseThrow(()-> new AppException("User not found"));
+
+        OnboardingRecord record = onboardingRecordRepository.findById(id)
+                .orElseThrow(()-> new AppException("Onboarding record not found"));
+
+        if(user.getRole() == Role.MANAGER && !record.getManager().getId().equals(user.getId())) {
+            throw new AppException("Not authorized to view this record");
+        }
+
+        if(user.getRole() == Role.NEW_HIRE && !record.getNewHire().getId().equals(user.getId())){
+            throw new AppException("Not authorized to view this record");
+        }
+
+        return toResponse(record);
+    }
+
     private OnboardingResponse toResponse(OnboardingRecord record) {
+        List<TaskInstanceResponse> tasks = taskInstanceRepository
+                .findByOnboardingRecordId(record.getId())
+                .stream()
+                .map(i-> TaskInstanceResponse
+                        .builder()
+                        .id(i.getId())
+                        .title(i.getTitle())
+                        .dueDate(i.getDueDate())
+                        .taskStatus(i.getTaskStatus())
+                        .requiresApproval(i.getTask().isRequiresApproval())
+                        .build())
+                .toList();
+
+        return OnboardingResponse.builder()
+                .id(record.getId())
+                .newHireName(record.getNewHire().getUsername())
+                .managerName(record.getManager().getUsername())
+                .hrName(record.getManager().getUsername())
+                .journeyTitle(record.getJourney().getTitle())
+                .status(record.getStatus())
+                .startDate(record.getStartDate())
+                .tasks(tasks)
+                .build();
     }
 
-    public OnboardingResponse markCompleted(Long onboardingId) {
-    }
-
-    public List<OnboardingResponse> getMyTeam(String username) {
-    }
-
-    public OnboardingResponse getMyOnboarding(String username) {
-    }
 }

@@ -31,14 +31,18 @@ public class OnboardingController {
 
     @GetMapping
     @PreAuthorize("hasRole('HR')")
-    public ResponseEntity<List<OnboardingResponse>> getAllOnboardings() {
-        return ResponseEntity.ok(onboardingService.getAllOnboardings());
+   public ResponseEntity<ApiResponse<List<OnboardingResponse>>> getAllOnboardings(){
+        return ResponseEntity.ok(ApiResponse.success("All Onboarding",onboardingService.getAllOnboardings()));
+
     }
 
-    @GetMapping("/{id}")
-    @PreAuthorize("hasRole('HR')")
-    public ResponseEntity<ApiResponse<OnboardingResponse>> getOnboardingById(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success("Fetching Onboarding based on Id", onboardingService.getOnboardingById(id)));
+    @GetMapping("/{onboardingId}")
+    @PreAuthorize("hasAnyRole('HR','MANAGER','NEW_HIRE')")
+    public ResponseEntity<ApiResponse<OnboardingResponse>> getById(
+            @PathVariable Long onboardingId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(ApiResponse.success("Onboarding record",
+                onboardingService.getOnboardingById(onboardingId, userDetails.getUsername())));
     }
 
     @PutMapping("/{onboardingId}/complete")
