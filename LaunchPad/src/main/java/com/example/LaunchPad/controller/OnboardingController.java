@@ -2,6 +2,7 @@ package com.example.LaunchPad.controller;
 
 import com.example.LaunchPad.dto.request.CreateOnboardingRequest;
 import com.example.LaunchPad.dto.response.ApiResponse;
+import com.example.LaunchPad.dto.response.OnboardingRecordResponse;
 import com.example.LaunchPad.dto.response.OnboardingResponse;
 import com.example.LaunchPad.service.OnboardingService;
 import jakarta.validation.Valid;
@@ -21,6 +22,13 @@ public class OnboardingController {
 
     private final OnboardingService onboardingService;
 
+    @PostMapping
+    @PreAuthorize("hasRole('HR')")
+    public ResponseEntity<ApiResponse<OnboardingResponse>> createOnboarding(@Valid @RequestBody CreateOnboardingRequest request,
+                                                                            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(ApiResponse.success("Successfully created an onboarding record",onboardingService.createOnboarding(request,userDetails.getUsername())));
+    }
+
     @GetMapping
     @PreAuthorize("hasRole('HR')")
     public ResponseEntity<List<OnboardingResponse>> getAllOnboardings() {
@@ -33,4 +41,25 @@ public class OnboardingController {
         return ResponseEntity.ok(ApiResponse.success("Fetching Onboarding based on Id", onboardingService.getOnboardingById(id)));
     }
 
+    @PutMapping("/{onboardingId}/complete")
+    @PreAuthorize("hasRole('HR')")
+    public ResponseEntity<ApiResponse<OnboardingResponse>> markCompleted(@PathVariable Long onboardingId) {
+        return ResponseEntity.ok(ApiResponse.success("Onboarding marked as completed",onboardingService.markCompleted(onboardingId)));
+    }
+
+    @GetMapping("/my-team")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<ApiResponse<List<OnboardingResponse>>> getMyTeam(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(ApiResponse.success("My team",
+                onboardingService.getMyTeam(userDetails.getUsername())));
+    }
+
+    @GetMapping("/my")
+    @PreAuthorize("hasRole('NEW_HIRE')")
+    public ResponseEntity<ApiResponse<OnboardingResponse>> getMyOnboarding(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(ApiResponse.success("My onboarding",
+                onboardingService.getMyOnboarding(userDetails.getUsername())));
+    }
 }

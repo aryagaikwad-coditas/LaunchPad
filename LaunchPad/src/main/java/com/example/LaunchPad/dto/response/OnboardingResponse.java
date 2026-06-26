@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.boot.convert.DataSizeUnit;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -15,24 +16,11 @@ import java.time.LocalDate;
 @Builder
 public class OnboardingResponse {
     private Long id;
-
-    private Long newHireId;
-
     private String newHireName;
-
-    private Long managerId;
-
     private String managerName;
-
-    private Long hrId;
-
     private String hrName;
-
-    private Long journeyId;
-
     private String journeyTitle;
-
-    private LocalDate startDate;
-
     private OnboardingStatus status;
+    private LocalDate startDate;
+    private List<TaskInstanceResponse> tasks;
 }

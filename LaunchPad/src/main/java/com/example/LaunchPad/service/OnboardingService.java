@@ -1,14 +1,13 @@
 package com.example.LaunchPad.service;
 
+import com.example.LaunchPad.constants.OnboardingStatus;
+import com.example.LaunchPad.constants.Role;
+import com.example.LaunchPad.constants.TaskStatus;
 import com.example.LaunchPad.dto.request.CreateOnboardingRequest;
 import com.example.LaunchPad.dto.response.OnboardingResponse;
-import com.example.LaunchPad.entity.OnboardingRecord;
-import com.example.LaunchPad.entity.Users;
+import com.example.LaunchPad.entity.*;
 import com.example.LaunchPad.exceptions.AppException;
-import com.example.LaunchPad.repository.DocumentRepository;
-import com.example.LaunchPad.repository.OnboardingRecordRepository;
-import com.example.LaunchPad.repository.TaskInstanceRepository;
-import com.example.LaunchPad.repository.UserRepository;
+import com.example.LaunchPad.repository.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.print.Doc;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,8 +25,10 @@ import java.util.List;
 public class OnboardingService {
 
     private final TaskInstanceRepository  taskInstanceRepository;
-    private final DocumentRepository documentRepository;
+    private final TaskRepository taskRepository;
+    private final JourneyRepository  journeyRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
     private final OnboardingRecordRepository onboardingRecordRepository;
 
 
@@ -59,4 +62,64 @@ public class OnboardingService {
         return map(onboardingRecord);
     }
 
+    public OnboardingResponse createOnboarding(@Valid CreateOnboardingRequest request, String hrMail) {
+        Users newHire = userRepository.findById(request.getNewHireId())
+                .orElseThrow(()-> new AppException("User not found"));
+
+        if(newHire.getRole() != Role.NEW_HIRE){
+            throw new AppException("Selected user is not a new hire role");
+        }
+
+        Users manager = userRepository.findById(request.getManagerId())
+                .orElseThrow(()-> new AppException("Manager not found"));
+
+        if(manager.getRole() != Role.MANAGER){
+            throw new AppException("Selected user is not a manager role");
+        }
+        Users hr = userRepository.findByEmail(hrMail)
+                .orElseThrow(()-> new AppException("Hr not found "));
+
+        Journey journey =journeyRepository.findById(request.getJourneyId())
+                .orElseThrow(()-> new AppException("Journey not found"));
+
+        List<Task> templateTasks = taskRepository.findByJourneyId(journey.getId());
+        if (templateTasks.isEmpty()) {
+            throw new AppException("Journey has no tasks");
+        }
+        OnboardingRecord record =  OnboardingRecord.builder()
+                .newHire(newHire)
+                .manager(manager)
+                .hr(hr)
+                .journey(journey)
+                .startDate(LocalDate.now())
+                .status(OnboardingStatus.IN_PROGRESS)
+                .build();
+
+        onboardingRecordRepository.save(record);
+
+        List<TaskInstance> instances = new ArrayList<>();
+        for (Task task : templateTasks) {
+            instances.add(TaskInstance.builder()
+                    .onboardingRecord(record)
+                    .task(task)
+                    .title(task.getTitle())
+                    .taskStatus(TaskStatus.TODO)
+                    .dueDate(LocalDate.now().plusDays(task.getDueDaysOffset()))
+                    .build());
+        }
+        taskInstanceRepository.saveAll(instances);
+        return toResponse(record);
+    }
+
+    private OnboardingResponse toResponse(OnboardingRecord record) {
+    }
+
+    public OnboardingResponse markCompleted(Long onboardingId) {
+    }
+
+    public List<OnboardingResponse> getMyTeam(String username) {
+    }
+
+    public OnboardingResponse getMyOnboarding(String username) {
+    }
 }

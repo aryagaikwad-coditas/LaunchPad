@@ -11,5 +11,5 @@ public class CreateOnboardingRequest {
     private Long managerId;
     private Long journeyId;
     private Long newHireId;
-    private Long hrId;
+
 }
