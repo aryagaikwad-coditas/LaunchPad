@@ -46,6 +46,7 @@ public class OnboardingService {
         if(manager.getRole() != Role.MANAGER){
             throw new AppException("Selected user is not a manager role");
         }
+
         Users hr = userRepository.findByEmail(hrMail)
                 .orElseThrow(()-> new AppException("Hr not found "));
 
