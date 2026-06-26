@@ -20,8 +20,6 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
 
     public void uploadDocument(MultipartFile file) {
-        if(file.isEmpty()) {
-            throw new AppException("file is empty ");
-        }
+
     }
 }

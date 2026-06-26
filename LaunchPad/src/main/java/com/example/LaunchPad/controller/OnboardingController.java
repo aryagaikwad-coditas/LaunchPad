@@ -2,7 +2,6 @@ package com.example.LaunchPad.controller;
 
 import com.example.LaunchPad.dto.request.CreateOnboardingRequest;
 import com.example.LaunchPad.dto.response.ApiResponse;
-import com.example.LaunchPad.dto.response.OnboardingRecordResponse;
 import com.example.LaunchPad.dto.response.OnboardingResponse;
 import com.example.LaunchPad.service.OnboardingService;
 import jakarta.validation.Valid;

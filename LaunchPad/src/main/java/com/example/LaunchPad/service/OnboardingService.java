@@ -36,19 +36,15 @@ public class OnboardingService {
         Users newHire = userRepository.findById(request.getNewHireId())
                 .orElseThrow(()-> new AppException("User not found"));
 
-        if(newHire.getRole() != Role.NEW_HIRE){
-            throw new AppException("Selected user is not a new hire role");
-        }
-
         Users manager = userRepository.findById(request.getManagerId())
                 .orElseThrow(()-> new AppException("Manager not found"));
 
-        if(manager.getRole() != Role.MANAGER){
-            throw new AppException("Selected user is not a manager role");
-        }
-
         Users hr = userRepository.findByEmail(hrMail)
                 .orElseThrow(()-> new AppException("Hr not found "));
+
+        if(hr.getRole() != Role.HR) {
+            throw new AppException("Selected role is not hr ");
+        }
 
         Journey journey =journeyRepository.findById(request.getJourneyId())
                 .orElseThrow(()-> new AppException("Journey not found"));
